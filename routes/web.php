@@ -8,4 +8,4 @@ Route::get('/', [TurtleController::class, 'index']);
 
 // Маршрут списка черепах
 Route::resource('turtles', TurtleController::class)
-    ->only(['index', 'create', 'store', 'show']);
+    ->only(['index', 'create', 'store', 'show', 'destroy']);

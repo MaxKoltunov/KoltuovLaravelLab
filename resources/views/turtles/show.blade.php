@@ -98,10 +98,22 @@
                             'glossary' => $glossary,
                         ])</p>
 
-                        <a href="{{ route('turtles.index') }}"
-                           class="btn btn-primary mt-3">
-                            К списку черепах
-                        </a>
+                        <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
+                            <a href="{{ route('turtles.index') }}"
+                               class="btn btn-primary">
+                                К списку черепах
+                            </a>
+
+                            <form action="{{ route('turtles.destroy', $turtle) }}"
+                                  method="POST"
+                                  onsubmit="return confirm('Удалить черепаху «{{ $turtle->name }}» из каталога?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-outline-danger">
+                                    Удалить черепаху
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </section>

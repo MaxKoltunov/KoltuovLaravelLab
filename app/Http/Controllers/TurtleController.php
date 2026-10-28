@@ -100,6 +100,12 @@ class TurtleController extends Controller
      */
     public function destroy(Turtle $turtle)
     {
-        //
+        // Мягкое удаление: Laravel заполняет deleted_at, но не уничтожает запись.
+        // Загруженное изображение оставляем на диске для возможного восстановления.
+        $turtle->delete();
+
+        return redirect()
+            ->route('turtles.index')
+            ->with('success', 'Черепаха удалена из каталога.');
     }
 }
