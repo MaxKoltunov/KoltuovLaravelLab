@@ -58,7 +58,9 @@ class TurtleSeeder extends Seeder
         ];
 
         foreach ($turtles as $turtle) {
-            Turtle::updateOrCreate(
+            // Не трогаем записи, которые пользователь уже отредактировал
+            // или мягко удалил (SoftDeletes).
+            Turtle::withTrashed()->firstOrCreate(
                 ['scientific_name' => $turtle['scientific_name']],
                 array_merge($turtle, [
                     'catalogued_at' => now()->toDateString(),
