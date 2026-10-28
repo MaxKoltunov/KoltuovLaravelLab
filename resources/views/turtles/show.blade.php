@@ -106,7 +106,7 @@
 
                             <form action="{{ route('turtles.destroy', $turtle) }}"
                                   method="POST"
-                                  onsubmit="return confirm('Удалить черепаху «{{ $turtle->name }}» из каталога?')">
+                                  onsubmit="return confirm('Вы действительно хотите удалить эту черепаху из каталога?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-outline-danger">
