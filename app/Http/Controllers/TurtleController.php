@@ -84,7 +84,7 @@ class TurtleController extends Controller
      */
     public function edit(Turtle $turtle)
     {
-        //
+        return view('turtles.edit', compact('turtle'));
     }
 
     /**
@@ -92,7 +92,44 @@ class TurtleController extends Controller
      */
     public function update(Request $request, Turtle $turtle)
     {
-        //
+        // Те же правила, что при создании, но собственное латинское
+        // название разрешено оставлять без изменений.
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'scientific_name' => [
+                'required', 'string', 'max:255',
+                Rule::unique('turtles', 'scientific_name')
+                    ->ignore($turtle->getKey())
+                    ->withoutTrashed(),
+            ],
+            'category' => ['required', Rule::in(['Морская', 'Пресноводная', 'Сухопутная'])],
+            'short_description' => ['required', 'string', 'max:2000'],
+            'intro_description' => ['required', 'string', 'max:5000'],
+            'full_description' => ['required', 'string', 'max:10000'],
+            'catalogued_at' => ['nullable', 'date_format:Y-m-d'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+        ], [
+            'scientific_name.unique' => 'Черепаха с таким латинским названием уже существует.',
+            'image.image' => 'Выберите файл изображения.',
+            'image.mimes' => 'Допустимы только JPG, PNG и WebP.',
+            'image.max' => 'Размер изображения не должен превышать 5 МБ.',
+        ]);
+
+        unset($validated['image']);
+
+        if ($request->hasFile('image')) {
+            // Если выбрана новая фотография, сохраняем её и обновляем путь.
+            // Старый файл пока оставляем: исходные изображения могут
+            // использоваться сидером, а запись может понадобиться восстановить.
+            $validated['image_path'] = $request->file('image')->store('images', 'public');
+        }
+
+        // Без нового файла старое изображение остаётся неизменным.
+        $turtle->update($validated);
+
+        return redirect()
+            ->route('turtles.show', $turtle)
+            ->with('success', 'Данные черепахи успешно обновлены.');
     }
 
     /**

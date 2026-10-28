@@ -104,6 +104,11 @@
                                 К списку черепах
                             </a>
 
+                            <a href="{{ route('turtles.edit', $turtle) }}"
+                               class="btn btn-outline-primary">
+                                Редактировать
+                            </a>
+
                             <form action="{{ route('turtles.destroy', $turtle) }}"
                                   method="POST"
                                   onsubmit="return confirm('Вы действительно хотите удалить эту черепаху из каталога?')">
