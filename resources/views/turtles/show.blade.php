@@ -20,9 +20,15 @@
                         <span class="site-name">Портал для зоологов</span>
                     </a>
 
-                    <button class="btn-login" type="button" id="uploadButton">
-                        Загрузить
-                    </button>
+                    <div class="d-flex align-items-center gap-2">
+                        <a href="{{ route('turtles.create') }}"
+                           class="btn-login text-decoration-none">
+                            Добавить
+                        </a>
+                        <button class="btn-login" type="button" id="uploadButton">
+                                                Загрузить
+                                            </button>
+                    </div>
                 </div>
             </nav>
         </header>
@@ -32,6 +38,11 @@
         @endphp
 
         <main class="container">
+            @if (session('success'))
+                <div class="alert alert-success mt-3" role="status">
+                    {{ session('success') }}
+                </div>
+            @endif
             <section class="family-info">
                 <a href="{{ route('turtles.index') }}"
                    class="d-inline-block mb-3 text-decoration-none">
