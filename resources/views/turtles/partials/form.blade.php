@@ -71,7 +71,7 @@
         <input type="file" name="image" id="image"
                class="form-control @error('image') is-invalid @enderror"
                accept="image/jpeg,image/png,image/webp">
-        <div class="form-text">JPG, PNG или WebP, не более 5 МБ. Поле необязательное.</div>
+        <div class="form-text">JPG, PNG или WebP, не более 5 МБ. После загрузки изображение уменьшается до 1200×900 пикселей с сохранением пропорций. Поле необязательное.</div>
         @error('image') <div class="invalid-feedback">{{ $message }}</div> @enderror
 
         @if ($turtle?->image_path)

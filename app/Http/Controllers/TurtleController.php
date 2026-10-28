@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Turtle;
+use App\Services\TurtleImageService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -33,7 +34,7 @@ class TurtleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, TurtleImageService $images)
     {
         // Серверная валидация обязательна, даже если форма проверяется браузером.
         $validated = $request->validate([
@@ -55,11 +56,10 @@ class TurtleController extends Controller
             'image.max' => 'Размер изображения не должен превышать 5 МБ.',
         ]);
 
-        // Изображения хранятся в storage/app/public/images.
-        // В базе сохраняется только относительный путь к файлу.
+        // Перед сохранением файл уменьшается на сервере. В БД остаётся только путь.
         unset($validated['image']);
         if ($request->hasFile('image')) {
-            $validated['image_path'] = $request->file('image')->store('images', 'public');
+            $validated['image_path'] = $images->store($request->file('image'));
         }
 
         $turtle = Turtle::create($validated);
@@ -90,7 +90,7 @@ class TurtleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Turtle $turtle)
+    public function update(Request $request, Turtle $turtle, TurtleImageService $images)
     {
         // Те же правила, что при создании, но собственное латинское
         // название разрешено оставлять без изменений.
@@ -118,10 +118,10 @@ class TurtleController extends Controller
         unset($validated['image']);
 
         if ($request->hasFile('image')) {
-            // Если выбрана новая фотография, сохраняем её и обновляем путь.
+            // Новая фотография уменьшается перед сохранением, затем обновляется путь.
             // Старый файл пока оставляем: исходные изображения могут
             // использоваться сидером, а запись может понадобиться восстановить.
-            $validated['image_path'] = $request->file('image')->store('images', 'public');
+            $validated['image_path'] = $images->store($request->file('image'));
         }
 
         // Без нового файла старое изображение остаётся неизменным.

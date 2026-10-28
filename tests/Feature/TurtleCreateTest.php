@@ -78,6 +78,10 @@ class TurtleCreateTest extends TestCase
 
     public function test_valid_uploaded_image_is_saved_to_public_storage(): void
     {
+        if (!extension_loaded('gd')) {
+            $this->markTestSkipped('Включите GD для тестирования обработки изображений.');
+        }
+
         Storage::fake('public');
 
         // Используем реальный JPEG из репозитория; GD не требуется.

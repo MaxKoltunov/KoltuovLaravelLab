@@ -111,6 +111,10 @@ class TurtleUpdateTest extends TestCase
 
     public function test_uploaded_image_replaces_image_path_in_database(): void
     {
+        if (!extension_loaded('gd')) {
+            $this->markTestSkipped('Включите GD для тестирования обработки изображений.');
+        }
+
         $turtle = $this->createTurtle();
         Storage::fake('public');
 
