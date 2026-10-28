@@ -42,7 +42,9 @@ class TurtleController extends Controller
      */
     public function show(Turtle $turtle)
     {
-        //
+        // Route model binding автоматически найдёт черепаху по ID.
+        // Удалённые через SoftDeletes записи вернут 404.
+        return view('turtles.show', compact('turtle'));
     }
 
     /**
