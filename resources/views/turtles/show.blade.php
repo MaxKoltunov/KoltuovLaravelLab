@@ -27,6 +27,10 @@
             </nav>
         </header>
 
+        @php
+            $glossary = config('turtle_glossary')[$turtle->scientific_name] ?? null;
+        @endphp
+
         <main class="container">
             <section class="family-info">
                 <a href="{{ route('turtles.index') }}"
@@ -61,7 +65,11 @@
                                 </span>
 
                                 <h2 class="fs-5">О виде</h2>
-                                <p>{{ $turtle->intro_description }}</p>
+                                <p>@include('turtles.partials.glossary-text', [
+                                    'content' => $turtle->intro_description,
+                                    'field' => 'intro_description',
+                                    'glossary' => $glossary,
+                                ])</p>
 
                                 @if ($turtle->catalogued_at)
                                     <p class="text-muted small">
@@ -73,7 +81,11 @@
                         </div>
 
                         <h2 class="fs-5">Подробное описание</h2>
-                        <p style="white-space: pre-line;">{{ $turtle->full_description }}</p>
+                        <p style="white-space: pre-line;">@include('turtles.partials.glossary-text', [
+                            'content' => $turtle->full_description,
+                            'field' => 'full_description',
+                            'glossary' => $glossary,
+                        ])</p>
 
                         <a href="{{ route('turtles.index') }}"
                            class="btn btn-primary mt-3">

@@ -57,4 +57,42 @@ class TurtleShowTest extends TestCase
 
         $this->get(route('turtles.show', $turtle))->assertNotFound();
     }
+
+    public function test_glossary_popovers_are_restored_for_all_five_turtles(): void
+    {
+        $cases = [
+            ['Chelonia mydas', 'intro_description', 'Обитает в субтропических водах океана.', 'Субтропические воды'],
+            ['Dermochelys coriacea', 'full_description', 'Роговых щитков нет.', 'Роговые щитки'],
+            ['Chelydra serpentina', 'full_description', 'Черепаха с панцирем длиной до 35 см.', 'Панцирь'],
+            ['Pyxis arachnoides', 'full_description', 'Передняя доля пластрона подвижна.', 'Пластрон'],
+            ['Aldabrachelys gigantea', 'full_description', 'Длина карапакса до 120 см.', 'Карапакс'],
+        ];
+
+        foreach ($cases as [$scientificName, $field, $description, $title]) {
+            $turtle = $this->createTurtle();
+            $turtle->update([
+                'scientific_name' => $scientificName,
+                $field => $description,
+            ]);
+
+            $this->get(route('turtles.show', $turtle))
+                ->assertOk()
+                ->assertSee('data-bs-toggle="popover"', false)
+                ->assertSee($title);
+        }
+    }
+
+    public function test_glossary_keeps_database_text_html_escaped(): void
+    {
+        $turtle = $this->createTurtle();
+        $turtle->update([
+            'full_description' => '<script>alert(1)</script> панцирем',
+        ]);
+
+        $this->get(route('turtles.show', $turtle))
+            ->assertOk()
+            ->assertDontSee('<script>', false)
+            ->assertSee('&lt;script&gt;', false)
+            ->assertSee('data-bs-toggle="popover"', false);
+    }
 }
