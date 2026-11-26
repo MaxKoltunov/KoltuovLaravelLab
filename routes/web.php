@@ -9,3 +9,5 @@ Route::get('/', [TurtleController::class, 'index']);
 // Маршрут списка черепах
 Route::resource('turtles', TurtleController::class)
     ->only(['index', 'create', 'store', 'show', 'edit', 'update', 'destroy']);
+
+require __DIR__.'/auth.php';
