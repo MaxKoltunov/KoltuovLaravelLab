@@ -31,6 +31,22 @@ class AuthenticationTest extends TestCase
         $this->assertTrue(Hash::check('test-password', $user->password));
     }
 
+    public function test_registration_rejects_email_without_domain_suffix(): void
+    {
+        foreach (['123@gmail', '123@gmail.', 'not-an-email'] as $email) {
+            $this->post(route('register'), [
+                'name' => 'Invalid Email',
+                'email' => $email,
+                'password' => 'test-password',
+                'password_confirmation' => 'test-password',
+            ])->assertSessionHasErrors('email');
+
+            $this->assertGuest();
+        }
+
+        $this->assertDatabaseCount('users', 0);
+    }
+
     public function test_registration_rejects_duplicate_email(): void
     {
         $user = User::factory()->create();

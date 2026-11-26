@@ -1,8 +1,17 @@
 @extends('layouts.app', ['showCatalogActions' => true])
 
-@section('title', 'Семейство черепах')
+@section('title', isset($catalogUser) ? 'Черепахи пользователя ' . $catalogUser->name : 'Семейство черепах')
 
 @section('content')
+    @if (isset($catalogUser))
+        <section class="family-info">
+            <a href="{{ route('users.index') }}" class="d-inline-block mb-3 text-decoration-none">
+                &larr; К списку пользователей
+            </a>
+            <h1 class="family-title">Черепахи пользователя {{ $catalogUser->name }}</h1>
+            <a href="{{ route('turtles.index') }}" class="btn btn-outline-primary">Общий каталог</a>
+        </section>
+    @else
     <section class="family-info">
         <h1 class="family-title">
             Скрытошейные черепахи
@@ -55,9 +64,8 @@
             </div>
         </div>
     </section>
+    @endif
 
-
-    
     <div class="row
                 row-cols-1
                 row-cols-sm-1
@@ -87,6 +95,17 @@
                         <h3 class="card-title card__title">{{ $turtle->name }}</h3>
 
                         <p class="card__latin">{{ $turtle->scientific_name }}</p>
+
+                        @auth
+                            <p class="small text-muted">
+                                Владелец:
+                                @if ($turtle->user)
+                                    <a href="{{ route('users.turtles', $turtle->user) }}">{{ $turtle->user->name }}</a>
+                                @else
+                                    не назначен
+                                @endif
+                            </p>
+                        @endauth
 
                         <p class="card-text card__desc">
                             {{ $turtle->short_description }}

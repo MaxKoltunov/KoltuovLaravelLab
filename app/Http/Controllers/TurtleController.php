@@ -15,7 +15,7 @@ class TurtleController extends Controller
     public function index()
     {
         // Получаем все неудалённые записи из SQLite
-        $turtles = Turtle::orderBy('id')->get();
+        $turtles = Turtle::with('user')->orderBy('id')->get();
 
         // Передаём данные в Blade-представление
         return view('turtles.index', compact('turtles'));
@@ -44,7 +44,8 @@ class TurtleController extends Controller
             $validated['image_path'] = $images->store($request->file('image'));
         }
 
-        $turtle = Turtle::create($validated);
+        // Владелец берётся из сессии, а не из данных формы.
+        $turtle = $request->user()->turtles()->create($validated);
 
         return redirect()
             ->route('turtles.show', $turtle)
@@ -58,6 +59,8 @@ class TurtleController extends Controller
     {
         // Route model binding автоматически найдёт черепаху по ID.
         // Удалённые через SoftDeletes записи вернут 404.
+        $turtle->load('user');
+
         return view('turtles.show', compact('turtle'));
     }
 
@@ -66,6 +69,8 @@ class TurtleController extends Controller
      */
     public function edit(Turtle $turtle)
     {
+        abort_unless($turtle->user_id === auth()->id(), 403);
+
         return view('turtles.edit', compact('turtle'));
     }
 
@@ -74,6 +79,8 @@ class TurtleController extends Controller
      */
     public function update(TurtleRequest $request, Turtle $turtle, TurtleImageService $images)
     {
+        abort_unless($turtle->user_id === $request->user()->id, 403);
+
         $validated = $request->validated();
 
         unset($validated['image']);
@@ -98,6 +105,8 @@ class TurtleController extends Controller
      */
     public function destroy(Turtle $turtle)
     {
+        abort_unless($turtle->user_id === auth()->id(), 403);
+
         // Мягкое удаление: Laravel заполняет deleted_at, но не уничтожает запись.
         // Загруженное изображение оставляем на диске для возможного восстановления.
         $turtle->delete();

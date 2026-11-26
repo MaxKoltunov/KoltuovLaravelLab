@@ -39,6 +39,17 @@
                             {{ $turtle->category }}
                         </span>
 
+                        @auth
+                            <p class="small text-muted">
+                                Владелец:
+                                @if ($turtle->user)
+                                    <a href="{{ route('users.turtles', $turtle->user) }}">{{ $turtle->user->name }}</a>
+                                @else
+                                    не назначен
+                                @endif
+                            </p>
+                        @endauth
+
                         <h2 class="fs-5">О виде</h2>
                         <p>@include('turtles.partials.glossary-text', [
                             'content' => $turtle->intro_description,
@@ -68,6 +79,7 @@
                         К списку черепах
                     </a>
 
+                    @if (auth()->check() && $turtle->user_id === auth()->id())
                     <a href="{{ route('turtles.edit', $turtle) }}"
                        class="btn btn-outline-primary">
                         Редактировать
@@ -82,6 +94,7 @@
                             Удалить черепаху
                         </button>
                     </form>
+                    @endif
                 </div>
             </div>
         </div>

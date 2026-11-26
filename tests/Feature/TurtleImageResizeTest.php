@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Turtle;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -11,6 +12,12 @@ use Tests\TestCase;
 class TurtleImageResizeTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->actingAs(User::factory()->create());
+    }
 
     private function payload(array $extra = []): array
     {
@@ -74,7 +81,7 @@ class TurtleImageResizeTest extends TestCase
 
         Storage::fake('public');
 
-        $turtle = Turtle::create($this->payload([
+        $turtle = auth()->user()->turtles()->create($this->payload([
             'image_path' => 'images/old-image.jpg',
         ]));
 

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Turtle;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -12,9 +13,15 @@ class TurtleUpdateTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->actingAs(User::factory()->create());
+    }
+
     private function createTurtle(array $changes = []): Turtle
     {
-        return Turtle::create(array_merge([
+        return auth()->user()->turtles()->create(array_merge([
             'name' => 'Зелёная черепаха',
             'scientific_name' => 'Chelonia mydas',
             'category' => 'Морская',

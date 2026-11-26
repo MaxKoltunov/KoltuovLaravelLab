@@ -22,7 +22,8 @@
                         <label for="email" class="form-label">Электронная почта</label>
                         <input id="email" name="email" type="email"
                                class="form-control @error('email') is-invalid @enderror"
-                               value="{{ old('email') }}" autocomplete="email" required>
+                               value="{{ old('email') }}" autocomplete="email" required
+                               pattern=".+@.+[.].+" title="Например, name@gmail.com">
                         @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

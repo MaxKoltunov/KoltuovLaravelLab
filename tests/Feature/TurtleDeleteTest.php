@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Turtle;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -10,9 +11,15 @@ class TurtleDeleteTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->actingAs(User::factory()->create());
+    }
+
     private function createTurtle(): Turtle
     {
-        return Turtle::create([
+        return auth()->user()->turtles()->create([
             'name' => 'Тестовая черепаха',
             'scientific_name' => 'Testudo test',
             'category' => 'Сухопутная',

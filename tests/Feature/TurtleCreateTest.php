@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Turtle;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -11,6 +12,12 @@ use Tests\TestCase;
 class TurtleCreateTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->actingAs(User::factory()->create());
+    }
 
     private function validData(): array
     {
@@ -46,6 +53,7 @@ class TurtleCreateTest extends TestCase
         $this->assertDatabaseHas('turtles', [
             'name' => 'Греческая черепаха',
             'scientific_name' => 'Testudo graeca',
+            'user_id' => auth()->id(),
         ]);
 
         $this->get(route('turtles.show', $turtle))

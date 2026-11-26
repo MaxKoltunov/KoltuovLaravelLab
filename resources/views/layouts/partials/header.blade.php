@@ -10,7 +10,7 @@
             </a>
 
             <div class="d-flex flex-wrap align-items-center gap-2">
-                @if ($showCatalogActions ?? false)
+                @if (($showCatalogActions ?? false) && auth()->check())
                     <a href="{{ route('turtles.create') }}"
                        class="btn-login text-decoration-none">Добавить</a>
                     <button class="btn-login" type="button" id="uploadButton">
@@ -22,6 +22,8 @@
                     <a href="{{ route('login') }}" class="btn btn-outline-primary">Войти</a>
                     <a href="{{ route('register') }}" class="btn btn-primary">Регистрация</a>
                 @else
+                    <a href="{{ route('users.index') }}" class="btn btn-outline-primary">Пользователи</a>
+                    <a href="{{ route('users.turtles', auth()->user()) }}" class="btn btn-outline-primary">Мои черепахи</a>
                     <span class="text-muted">{{ auth()->user()->name }}</span>
                     <form method="POST" action="{{ route('logout') }}" class="m-0">
                         @csrf
