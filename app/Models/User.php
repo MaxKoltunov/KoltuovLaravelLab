@@ -31,6 +31,11 @@ class User extends Authenticatable
         'password',
     ];
 
+    // Новый экземпляр модели тоже имеет обычную роль по умолчанию.
+    protected $attributes = [
+        'is_admin' => false,
+    ];
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -40,6 +45,12 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    // Проверка административной роли.
+    public function isAdmin(): bool
+    {
+        return $this->is_admin;
+    }
 
     /**
      * Get the attributes that should be cast.
@@ -51,6 +62,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
         ];
     }
 }
