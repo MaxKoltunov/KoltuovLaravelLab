@@ -12,7 +12,7 @@ Route::resource('turtles', TurtleController::class)
 
 Route::middleware('auth')->group(function () {
     Route::get('users', [UserController::class, 'index'])->name('users.index');
-    Route::get('users/{user}/turtles', [UserController::class, 'turtles'])->name('users.turtles');
+    Route::get('users/{user:username}/turtles', [UserController::class, 'turtles'])->name('users.turtles');
 
     Route::get('admin/turtles/trash', [TurtleController::class, 'trash'])->name('turtles.trash');
     Route::patch('turtles/{turtle}/restore', [TurtleController::class, 'restore'])

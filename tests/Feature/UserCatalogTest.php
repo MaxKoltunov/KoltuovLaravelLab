@@ -41,6 +41,19 @@ class UserCatalogTest extends TestCase
             ->assertOk()->assertSee('Второй вид')->assertDontSee('Первый вид');
     }
 
+    public function test_user_catalog_routes_use_username_instead_of_id(): void
+    {
+        $user = User::factory()->create(['username' => 'amogus']);
+        $user->turtles()->create($this->data('Черепаха amogus', 'Testudo amogus'));
+
+        $this->assertSame('/users/amogus/turtles', route('users.turtles', $user, absolute: false));
+        $this->actingAs($user)->get('/users/amogus/turtles')
+            ->assertOk()->assertSee('Черепаха amogus');
+
+        $this->get('/users/'.$user->id.'/turtles')->assertNotFound();
+        $this->get('/users/unknown_username/turtles')->assertNotFound();
+    }
+
     public function test_store_uses_authenticated_user_and_ignores_forged_owner(): void
     {
         $first = User::factory()->create();

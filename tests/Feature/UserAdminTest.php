@@ -21,6 +21,7 @@ class UserAdminTest extends TestCase
         // Проверяем именно значение по умолчанию в базе без Eloquent.
         $id = DB::table('users')->insertGetId([
             'name' => 'Database User',
+            'username' => 'database_user',
             'email' => 'db@example.com',
             'password' => $user->password,
         ]);
@@ -49,6 +50,7 @@ class UserAdminTest extends TestCase
     {
         $this->post(route('register'), [
             'name' => 'Ordinary User',
+            'username' => 'ordinary_user',
             'email' => 'ordinary@example.com',
             'password' => 'test-password',
             'password_confirmation' => 'test-password',

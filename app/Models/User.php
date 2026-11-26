@@ -14,6 +14,12 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    // Route model binding ищет пользователя по username, а не по id.
+    public function getRouteKeyName(): string
+    {
+        return 'username';
+    }
+
     // Черепахи, добавленные этим пользователем.
     public function turtles(): HasMany
     {
@@ -27,6 +33,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'username',
         'email',
         'password',
     ];

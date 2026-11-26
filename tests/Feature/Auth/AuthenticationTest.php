@@ -21,6 +21,7 @@ class AuthenticationTest extends TestCase
     {
         $this->post(route('register'), [
             'name' => 'Test User',
+            'username' => 'test_user',
             'email' => 'test@example.com',
             'password' => 'test-password',
             'password_confirmation' => 'test-password',
@@ -28,6 +29,7 @@ class AuthenticationTest extends TestCase
 
         $user = User::where('email', 'test@example.com')->firstOrFail();
         $this->assertAuthenticatedAs($user);
+        $this->assertSame('test_user', $user->username);
         $this->assertTrue(Hash::check('test-password', $user->password));
     }
 
@@ -36,6 +38,7 @@ class AuthenticationTest extends TestCase
         foreach (['123@gmail', '123@gmail.', 'not-an-email'] as $email) {
             $this->post(route('register'), [
                 'name' => 'Invalid Email',
+                'username' => 'invalid_email',
                 'email' => $email,
                 'password' => 'test-password',
                 'password_confirmation' => 'test-password',
@@ -53,12 +56,32 @@ class AuthenticationTest extends TestCase
 
         $this->post(route('register'), [
             'name' => 'Another User',
+            'username' => 'another_user',
             'email' => $user->email,
             'password' => 'test-password',
             'password_confirmation' => 'test-password',
         ])->assertSessionHasErrors('email');
 
         $this->assertGuest();
+    }
+
+    public function test_registration_rejects_invalid_or_duplicate_usernames(): void
+    {
+        User::factory()->create(['username' => 'taken_name']);
+
+        foreach (['', 'ab', 'Taken', '12name', 'bad-name', 'bad/name', 'bad name', str_repeat('a', 33), 'taken_name'] as $username) {
+            $this->post(route('register'), [
+                'name' => 'New User',
+                'username' => $username,
+                'email' => 'new@example.com',
+                'password' => 'test-password',
+                'password_confirmation' => 'test-password',
+            ])->assertSessionHasErrors('username');
+
+            $this->assertGuest();
+        }
+
+        $this->assertDatabaseCount('users', 1);
     }
 
     public function test_user_can_login_and_logout(): void

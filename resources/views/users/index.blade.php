@@ -11,7 +11,10 @@
                     @forelse ($users as $user)
                         <a href="{{ route('users.turtles', $user) }}"
                            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            <span>{{ $user->name }} @if ($user->is(auth()->user())) (вы) @endif</span>
+                            <span>
+                                {{ $user->name }} @if ($user->is(auth()->user())) (вы) @endif
+                                <span class="text-muted small d-block">{{ '@'.$user->username }}</span>
+                            </span>
                             <span class="badge text-bg-primary rounded-pill">{{ $user->turtles_count }}</span>
                         </a>
                     @empty
