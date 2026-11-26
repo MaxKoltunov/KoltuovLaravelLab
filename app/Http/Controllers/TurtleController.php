@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TurtleRequest;
 use App\Models\Turtle;
 use App\Services\TurtleImageService;
-use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 
 class TurtleController extends Controller
 {
@@ -19,7 +18,7 @@ class TurtleController extends Controller
         $turtles = Turtle::orderBy('id')->get();
 
         // Передаём данные в Blade-представление
-        return view('welcome', compact('turtles'));
+        return view('turtles.index', compact('turtles'));
     }
 
 
@@ -34,27 +33,10 @@ class TurtleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, TurtleImageService $images)
+    public function store(TurtleRequest $request, TurtleImageService $images)
     {
-        // Серверная валидация обязательна, даже если форма проверяется браузером.
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'scientific_name' => [
-                'required', 'string', 'max:255',
-                Rule::unique('turtles', 'scientific_name')->withoutTrashed(),
-            ],
-            'category' => ['required', Rule::in(['Морская', 'Пресноводная', 'Сухопутная'])],
-            'short_description' => ['required', 'string', 'max:2000'],
-            'intro_description' => ['required', 'string', 'max:5000'],
-            'full_description' => ['required', 'string', 'max:10000'],
-            'catalogued_at' => ['nullable', 'date_format:Y-m-d'],
-            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
-        ], [
-            'scientific_name.unique' => 'Черепаха с таким латинским названием уже существует.',
-            'image.image' => 'Выберите файл изображения.',
-            'image.mimes' => 'Допустимы только JPG, PNG и WebP.',
-            'image.max' => 'Размер изображения не должен превышать 5 МБ.',
-        ]);
+        // Правила валидации находятся в TurtleRequest.
+        $validated = $request->validated();
 
         // Перед сохранением файл уменьшается на сервере. В БД остаётся только путь.
         unset($validated['image']);
@@ -90,30 +72,9 @@ class TurtleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Turtle $turtle, TurtleImageService $images)
+    public function update(TurtleRequest $request, Turtle $turtle, TurtleImageService $images)
     {
-        // Те же правила, что при создании, но собственное латинское
-        // название разрешено оставлять без изменений.
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'scientific_name' => [
-                'required', 'string', 'max:255',
-                Rule::unique('turtles', 'scientific_name')
-                    ->ignore($turtle->getKey())
-                    ->withoutTrashed(),
-            ],
-            'category' => ['required', Rule::in(['Морская', 'Пресноводная', 'Сухопутная'])],
-            'short_description' => ['required', 'string', 'max:2000'],
-            'intro_description' => ['required', 'string', 'max:5000'],
-            'full_description' => ['required', 'string', 'max:10000'],
-            'catalogued_at' => ['nullable', 'date_format:Y-m-d'],
-            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
-        ], [
-            'scientific_name.unique' => 'Черепаха с таким латинским названием уже существует.',
-            'image.image' => 'Выберите файл изображения.',
-            'image.mimes' => 'Допустимы только JPG, PNG и WebP.',
-            'image.max' => 'Размер изображения не должен превышать 5 МБ.',
-        ]);
+        $validated = $request->validated();
 
         unset($validated['image']);
 
