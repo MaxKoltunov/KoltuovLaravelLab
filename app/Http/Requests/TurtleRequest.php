@@ -4,14 +4,19 @@ namespace App\Http\Requests;
 
 use App\Models\Turtle;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
 class TurtleRequest extends FormRequest
 {
-    // Авторизация будет добавлена отдельно в лабораторной №4.
+    // Проверяем доступ до валидации и обработки загруженных файлов.
     public function authorize(): bool
     {
-        return true;
+        $turtle = $this->route('turtle');
+
+        return $turtle instanceof Turtle
+            ? Gate::allows('turtles.update', $turtle)
+            : Gate::allows('turtles.create');
     }
 
     public function rules(): array

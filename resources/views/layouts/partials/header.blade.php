@@ -10,12 +10,14 @@
             </a>
 
             <div class="d-flex flex-wrap align-items-center gap-2">
-                @if (($showCatalogActions ?? false) && auth()->check())
+                @if ($showCatalogActions ?? false)
+                @can('turtles.create')
                     <a href="{{ route('turtles.create') }}"
                        class="btn-login text-decoration-none">Добавить</a>
                     <button class="btn-login" type="button" id="uploadButton">
                         Загрузить
                     </button>
+                @endcan
                 @endif
 
                 @guest
@@ -24,7 +26,12 @@
                 @else
                     <a href="{{ route('users.index') }}" class="btn btn-outline-primary">Пользователи</a>
                     <a href="{{ route('users.turtles', auth()->user()) }}" class="btn btn-outline-primary">Мои черепахи</a>
-                    <span class="text-muted">{{ auth()->user()->name }}</span>
+                    @can('turtles.view-deleted')
+                        <a href="{{ route('turtles.trash') }}" class="btn btn-outline-danger">Корзина</a>
+                    @endcan
+                    <span class="text-muted">{{ auth()->user()->name }}
+                        @can('turtles.view-deleted') <span class="badge text-bg-warning">Администратор</span> @endcan
+                    </span>
                     <form method="POST" action="{{ route('logout') }}" class="m-0">
                         @csrf
                         <button type="submit" class="btn btn-outline-secondary">Выйти</button>

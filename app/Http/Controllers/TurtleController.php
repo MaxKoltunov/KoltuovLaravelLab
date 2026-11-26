@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\TurtleRequest;
 use App\Models\Turtle;
 use App\Services\TurtleImageService;
+use Illuminate\Support\Facades\Gate;
 
 class TurtleController extends Controller
 {
@@ -27,6 +28,8 @@ class TurtleController extends Controller
      */
     public function create()
     {
+        Gate::authorize('turtles.create');
+
         return view('turtles.create');
     }
 
@@ -35,6 +38,8 @@ class TurtleController extends Controller
      */
     public function store(TurtleRequest $request, TurtleImageService $images)
     {
+        Gate::authorize('turtles.create');
+
         // Правила валидации находятся в TurtleRequest.
         $validated = $request->validated();
 
@@ -57,8 +62,11 @@ class TurtleController extends Controller
      */
     public function show(Turtle $turtle)
     {
-        // Route model binding автоматически найдёт черепаху по ID.
-        // Удалённые через SoftDeletes записи вернут 404.
+        // Удалённые записи доступны только администратору.
+        if ($turtle->trashed()) {
+            abort_unless(Gate::allows('turtles.view-deleted'), 404);
+        }
+
         $turtle->load('user');
 
         return view('turtles.show', compact('turtle'));
@@ -69,7 +77,7 @@ class TurtleController extends Controller
      */
     public function edit(Turtle $turtle)
     {
-        abort_unless($turtle->user_id === auth()->id(), 403);
+        Gate::authorize('turtles.update', $turtle);
 
         return view('turtles.edit', compact('turtle'));
     }
@@ -79,7 +87,7 @@ class TurtleController extends Controller
      */
     public function update(TurtleRequest $request, Turtle $turtle, TurtleImageService $images)
     {
-        abort_unless($turtle->user_id === $request->user()->id, 403);
+        Gate::authorize('turtles.update', $turtle);
 
         $validated = $request->validated();
 
@@ -114,5 +122,40 @@ class TurtleController extends Controller
         return redirect()
             ->route('turtles.index')
             ->with('success', 'Черепаха удалена из каталога.');
+    }
+
+    // Общая корзина администратора.
+    public function trash()
+    {
+        Gate::authorize('turtles.view-deleted');
+
+        $turtles = Turtle::onlyTrashed()->with('user')->orderBy('id')->get();
+
+        return view('turtles.index', [
+            'turtles' => $turtles,
+            'trashOnly' => true,
+        ]);
+    }
+
+    public function restore(Turtle $turtle)
+    {
+        Gate::authorize('turtles.restore', $turtle);
+
+        $turtle->restore();
+
+        return redirect()->route('turtles.show', $turtle)
+            ->with('success', 'Черепаха восстановлена.');
+    }
+
+    public function forceDelete(Turtle $turtle)
+    {
+        Gate::authorize('turtles.force-delete', $turtle);
+
+        // Удаляем строку без возможности восстановления. Общие файлы
+        // изображений оставляем: они могут использоваться другими записями.
+        $turtle->forceDelete();
+
+        return redirect()->route('turtles.trash')
+            ->with('success', 'Черепаха удалена окончательно.');
     }
 }

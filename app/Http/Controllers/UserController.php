@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class UserController extends Controller
@@ -16,7 +17,13 @@ class UserController extends Controller
 
     public function turtles(User $user): View
     {
-        $turtles = $user->turtles()->with('user')->orderBy('id')->get();
+        $query = $user->turtles()->with('user')->orderBy('id');
+
+        if (Gate::allows('turtles.view-deleted')) {
+            $query->withTrashed();
+        }
+
+        $turtles = $query->get();
 
         return view('turtles.index', [
             'turtles' => $turtles,

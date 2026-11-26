@@ -18,6 +18,10 @@
             <span class="latin">({{ $turtle->scientific_name }})</span>
         </h1>
 
+        @if ($turtle->trashed())
+            <div class="alert alert-warning">Запись мягко удалена. Доступна только администратору.</div>
+        @endif
+
         <div class="card family-content">
             <div class="card-body p-4">
                 <div class="modal__article">
@@ -79,12 +83,14 @@
                         К списку черепах
                     </a>
 
-                    @if (auth()->check() && $turtle->user_id === auth()->id())
+                    @can('turtles.update', $turtle)
                     <a href="{{ route('turtles.edit', $turtle) }}"
                        class="btn btn-outline-primary">
                         Редактировать
                     </a>
 
+                    @endcan
+                    @can('turtles.delete', $turtle)
                     <form action="{{ route('turtles.destroy', $turtle) }}"
                           method="POST"
                           onsubmit="return confirm('Вы действительно хотите удалить эту черепаху из каталога?')">
@@ -94,7 +100,9 @@
                             Удалить черепаху
                         </button>
                     </form>
-                    @endif
+                    @endcan
+
+                    @include('turtles.partials.admin-actions')
                 </div>
             </div>
         </div>

@@ -1,14 +1,23 @@
 @extends('layouts.app', ['showCatalogActions' => true])
 
-@section('title', isset($catalogUser) ? 'Черепахи пользователя ' . $catalogUser->name : 'Семейство черепах')
+@section('title', ($trashOnly ?? false) ? 'Корзина' : (isset($catalogUser) ? 'Черепахи пользователя ' . $catalogUser->name : 'Семейство черепах'))
 
 @section('content')
-    @if (isset($catalogUser))
+    @if ($trashOnly ?? false)
+        <section class="family-info">
+            <h1 class="family-title">Корзина</h1>
+            <p>Мягко удалённые объекты всех пользователей.</p>
+            <a href="{{ route('turtles.index') }}" class="btn btn-outline-primary">Общий каталог</a>
+        </section>
+    @elseif (isset($catalogUser))
         <section class="family-info">
             <a href="{{ route('users.index') }}" class="d-inline-block mb-3 text-decoration-none">
                 &larr; К списку пользователей
             </a>
             <h1 class="family-title">Черепахи пользователя {{ $catalogUser->name }}</h1>
+            @can('turtles.view-deleted')
+                <p class="text-muted">Полный список, включая мягко удалённые записи.</p>
+            @endcan
             <a href="{{ route('turtles.index') }}" class="btn btn-outline-primary">Общий каталог</a>
         </section>
     @else
@@ -95,6 +104,10 @@
                         <h3 class="card-title card__title">{{ $turtle->name }}</h3>
 
                         <p class="card__latin">{{ $turtle->scientific_name }}</p>
+
+                        @if ($turtle->trashed())
+                            <p><span class="badge text-bg-danger">Удалена</span></p>
+                        @endif
 
                         @auth
                             <p class="small text-muted">

@@ -76,7 +76,7 @@ class TurtleCreateTest extends TestCase
 
     public function test_scientific_name_cannot_be_duplicated(): void
     {
-        Turtle::create($this->validData());
+        auth()->user()->turtles()->create($this->validData());
 
         $this->post(route('turtles.store'), $this->validData())
             ->assertSessionHasErrors('scientific_name');
