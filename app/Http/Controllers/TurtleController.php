@@ -113,7 +113,7 @@ class TurtleController extends Controller
      */
     public function destroy(Turtle $turtle)
     {
-        abort_unless($turtle->user_id === auth()->id(), 403);
+        Gate::authorize('turtles.delete', $turtle);
 
         // Мягкое удаление: Laravel заполняет deleted_at, но не уничтожает запись.
         // Загруженное изображение оставляем на диске для возможного восстановления.

@@ -68,6 +68,9 @@ class Turtle extends Model
 
         static::deleting(function (Turtle $turtle): void {
             if (! self::trustedConsole()) {
+                // Не доверяем изменённому в памяти владельцу или статусу удаления.
+                abort_if($turtle->isDirty(['user_id', 'deleted_at']), 403);
+
                 Gate::authorize(
                     $turtle->isForceDeleting() ? 'turtles.force-delete' : 'turtles.delete',
                     $turtle,
