@@ -26,6 +26,12 @@ class User extends Authenticatable
         return $this->hasMany(Turtle::class);
     }
 
+    // Комментарии, написанные пользователем.
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
     /**
      * The attributes that are mass assignable.
      *
