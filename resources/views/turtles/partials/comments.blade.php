@@ -4,7 +4,17 @@
     <div class="card family-content">
         <div class="card-body p-4">
             @forelse ($turtle->comments as $comment)
-                <article class="border-bottom pb-3 mb-3">
+                @php
+                    $isFriend = auth()->check()
+                        && (int) $comment->user_id !== (int) auth()->id()
+                        && in_array((int) $comment->user_id, $friendIds, true);
+                @endphp
+                <article id="comment-{{ $comment->id }}"
+                         @class([
+                             'pb-3 mb-3',
+                             'border-bottom' => ! $isFriend,
+                             'friend-comment bg-success-subtle border border-success-subtle rounded p-3' => $isFriend,
+                         ])>
                     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
                         <div>
                             @auth
@@ -14,6 +24,12 @@
                                 <span class="fw-semibold">{{ $comment->user->name }}</span>
                             @endauth
                             <span class="small text-muted">{{ '@'.$comment->user->username }}</span>
+                            @if ($isFriend)
+                                <span class="badge text-bg-success ms-1">
+                                    <i class="fa-solid fa-user-check" aria-hidden="true"></i>
+                                    Друг
+                                </span>
+                            @endif
                         </div>
                         <time datetime="{{ $comment->created_at->toIso8601String() }}" class="small text-muted">
                             {{ $comment->created_at->format('d.m.Y H:i') }}

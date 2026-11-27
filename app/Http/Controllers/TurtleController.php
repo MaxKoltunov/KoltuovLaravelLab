@@ -6,6 +6,7 @@ use App\Http\Requests\TurtleRequest;
 use App\Models\Turtle;
 use App\Services\TurtleImageService;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Http\Request;
 
 class TurtleController extends Controller
 {
@@ -60,7 +61,7 @@ class TurtleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Turtle $turtle)
+    public function show(Request $request, Turtle $turtle)
     {
         // Удалённые записи доступны только администратору.
         if ($turtle->trashed()) {
@@ -73,7 +74,15 @@ class TurtleController extends Controller
             'comments' => fn ($query) => $query->with('user')->orderBy('created_at')->orderBy('id'),
         ]);
 
-        return view('turtles.show', compact('turtle'));
+        // Один запрос к списку друзей независимо от количества комментариев.
+        $friendIds = $request->user()
+            ? $request->user()->friends()->pluck('users.id')->map(fn ($id) => (int) $id)->all()
+            : [];
+
+        return view('turtles.show', [
+            'turtle' => $turtle,
+            'friendIds' => $friendIds,
+        ]);
     }
 
     /**
