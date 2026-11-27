@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\TurtleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -11,6 +12,8 @@ Route::resource('turtles', TurtleController::class)
     ->only(['index']);
 
 Route::middleware('auth')->group(function () {
+    Route::post('turtles/{turtle}/comments', [CommentController::class, 'store'])->name('comments.store');
+
     Route::get('users', [UserController::class, 'index'])->name('users.index');
     Route::get('users/{user:username}/turtles', [UserController::class, 'turtles'])->name('users.turtles');
 

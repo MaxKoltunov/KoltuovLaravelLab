@@ -24,6 +24,10 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::define('turtles.create', fn (User $user): bool => true);
 
+        // Любой авторизованный пользователь может комментировать активную запись.
+        Gate::define('comments.create', fn (User $user, Turtle $turtle): bool =>
+            ! $turtle->trashed());
+
         Gate::define('turtles.update', fn (User $user, Turtle $turtle): bool =>
             ! $turtle->trashed() && ($user->isAdmin() || $turtle->user_id === $user->id));
 

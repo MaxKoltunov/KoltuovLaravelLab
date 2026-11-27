@@ -107,4 +107,6 @@
             </div>
         </div>
     </section>
+
+    @include('turtles.partials.comments')
 @endsection

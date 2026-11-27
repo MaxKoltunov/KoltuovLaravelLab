@@ -67,7 +67,11 @@ class TurtleController extends Controller
             abort_unless(Gate::allows('turtles.view-deleted'), 404);
         }
 
-        $turtle->load('user');
+        // Загружаем авторов комментариев заранее, чтобы избежать N+1 запросов.
+        $turtle->load([
+            'user',
+            'comments' => fn ($query) => $query->with('user')->orderBy('created_at')->orderBy('id'),
+        ]);
 
         return view('turtles.show', compact('turtle'));
     }
