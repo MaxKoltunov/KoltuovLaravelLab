@@ -33,14 +33,14 @@ class User extends Authenticatable
         return $this->hasMany(Comment::class);
     }
 
-    // Пользователи, которых добавил в друзья текущий пользователь.
+    // Друзья текущего пользователя (прямые связи).
     public function friends(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'friendships', 'user_id', 'friend_id')
             ->withTimestamps();
     }
 
-    // Пользователи, которые добавили текущего пользователя в друзья.
+    // Входящие связи; при обоюдной дружбе соответствуют списку friends().
     public function followers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'friendships', 'friend_id', 'user_id')
