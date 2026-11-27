@@ -26,6 +26,7 @@
                 @else
                     <a href="{{ route('users.index') }}" class="btn btn-outline-primary">Пользователи</a>
                     <a href="{{ route('friends.index') }}" class="btn btn-outline-primary">Друзья</a>
+                    <a href="{{ route('feed.index') }}" class="btn {{ request()->routeIs('feed.index') ? 'btn-primary' : 'btn-outline-primary' }}">Лента друзей</a>
                     <a href="{{ route('users.turtles', auth()->user()) }}" class="btn btn-outline-primary">Мои черепахи</a>
                     @can('turtles.view-deleted')
                         <a href="{{ route('turtles.trash') }}" class="btn btn-outline-danger">Корзина</a>

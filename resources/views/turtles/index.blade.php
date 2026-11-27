@@ -1,9 +1,18 @@
 @extends('layouts.app', ['showCatalogActions' => true])
 
-@section('title', ($trashOnly ?? false) ? 'Корзина' : (isset($catalogUser) ? 'Черепахи пользователя ' . $catalogUser->name : 'Семейство черепах'))
+@section('title', ($feedOnly ?? false) ? 'Лента друзей' : (($trashOnly ?? false) ? 'Корзина' : (isset($catalogUser) ? 'Черепахи пользователя ' . $catalogUser->name : 'Семейство черепах')))
 
 @section('content')
-    @if ($trashOnly ?? false)
+    @if ($feedOnly ?? false)
+        <section class="family-info">
+            <h1 class="family-title">Лента друзей</h1>
+            <p class="text-muted">Черепахи, добавленные вашими друзьями, от новых к старым.</p>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ route('friends.index') }}" class="btn btn-outline-primary">Мои друзья</a>
+                <a href="{{ route('users.index') }}" class="btn btn-outline-primary">Найти друзей</a>
+            </div>
+        </section>
+    @elseif ($trashOnly ?? false)
         <section class="family-info">
             <h1 class="family-title">Корзина</h1>
             <p>Мягко удалённые объекты всех пользователей.</p>
@@ -120,6 +129,19 @@
                             </p>
                         @endauth
 
+                        @if ($feedOnly ?? false)
+                            <p class="small text-muted">
+                                Создано:
+                                @if ($turtle->created_at)
+                                    <time datetime="{{ $turtle->created_at->toIso8601String() }}">
+                                        {{ $turtle->created_at->format('d.m.Y H:i') }}
+                                    </time>
+                                @else
+                                    дата неизвестна
+                                @endif
+                            </p>
+                        @endif
+
                         <p class="card-text card__desc">
                             {{ $turtle->short_description }}
                         </p>
@@ -134,7 +156,12 @@
         @empty
             <div class="col-12">
                 <div class="alert alert-info">
-                    В каталоге пока нет черепах.
+                    @if ($feedOnly ?? false)
+                        В ленте пока нет черепах друзей.
+                        <a href="{{ route('users.index') }}">Добавьте друзей</a>, чтобы видеть их новые записи.
+                    @else
+                        В каталоге пока нет черепах.
+                    @endif
                 </div>
             </div>
         @endforelse
