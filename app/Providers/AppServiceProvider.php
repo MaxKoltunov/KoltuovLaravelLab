@@ -24,6 +24,10 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::define('turtles.create', fn (User $user): bool => true);
 
+        // Нельзя добавить самого себя или удалить связь с самим собой.
+        Gate::define('friends.manage', fn (User $user, User $friend): bool =>
+            ! $user->is($friend));
+
         // Любой авторизованный пользователь может комментировать активную запись.
         Gate::define('comments.create', fn (User $user, Turtle $turtle): bool =>
             ! $turtle->trashed());

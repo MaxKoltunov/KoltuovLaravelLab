@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\FriendshipController;
 use App\Http\Controllers\TurtleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -15,6 +16,9 @@ Route::middleware('auth')->group(function () {
     Route::post('turtles/{turtle}/comments', [CommentController::class, 'store'])->name('comments.store');
 
     Route::get('users', [UserController::class, 'index'])->name('users.index');
+    Route::get('friends', [UserController::class, 'friends'])->name('friends.index');
+    Route::post('users/{user:username}/friendship', [FriendshipController::class, 'store'])->name('friends.store');
+    Route::delete('users/{user:username}/friendship', [FriendshipController::class, 'destroy'])->name('friends.destroy');
     Route::get('users/{user:username}/turtles', [UserController::class, 'turtles'])->name('users.turtles');
 
     Route::get('admin/turtles/trash', [TurtleController::class, 'trash'])->name('turtles.trash');
